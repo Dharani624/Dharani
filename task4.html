@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced HTML-CSS-JS Project</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+    }
+    header {
+        background: #333;
+        color: white;
+        padding: 15px;
+        text-align: center;
+    }
+    nav a {
+        color: white;
+        margin: 0 10px;
+        text-decoration: none;
+    }
+    section {
+        padding: 20px;
+        max-width: 900px;
+        margin: auto;
+    }
+    h2 {
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 5px;
+    }
+
+    /* Portfolio styling */
+    .project-card {
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+    }
+
+    /* To-Do list styling */
+    #todoSection input, #todoSection button {
+        padding: 8px;
+        margin: 5px;
+    }
+    #todoList li {
+        background: #f4f4f4;
+        margin: 5px;
+        padding: 8px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* Product listing styling */
+    .product-card {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px;
+        flex: 1 1 calc(33% - 20px);
+        box-sizing: border-box;
+    }
+    .product-grid {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .product-card {
+            flex: 1 1 calc(50% - 20px);
+        }
+    }
+    @media (max-width: 480px) {
+        .product-card {
+            flex: 1 1 100%;
+        }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>My Portfolio & Web Apps</h1>
+    <nav>
+        <a href="#portfolio">Portfolio</a>
+        <a href="#todoSection">To-Do App</a>
+        <a href="#products">Products</a>
+    </nav>
+</header>
+
+<!-- Portfolio Section -->
+<section id="portfolio">
+    <h2>About Me</h2>
+    <p>Hello!  I am Dharani. I am a web developer skilled in HTML, CSS, and JavaScript. I create responsive and interactive websites.</p>
+
+    <h2>Projects</h2>
+    <div class="project-card">
+        <h3>Project 1</h3>
+        <p>Description of project 1 .</p>
+    </div>
+    <div class="project-card">
+        <h3>Project 2</h3>
+        <p>Description of project 2.</p>
+    </div>
+
+    <h2>Contact</h2>
+    <p>Email: Dharani@gmail.com</p>
+</section>
+
+<!-- To-Do List Section -->
+<section id="todoSection">
+    <h2>To-Do List</h2>
+    <input type="text" id="todoInput" placeholder="Enter task">
+    <button onclick="addTodo()">Add Task</button>
+    <ul id="todoList"></ul>
+</section>
+
+<!-- Product Listing Section -->
+<section id="products">
+    <h2>Product Listing</h2>
+    <label>Filter by Category:
+        <select id="categoryFilter" onchange="filterProducts()">
+            <option value="all">All</option>
+            <option value="electronics">Electronics</option>
+            <option value="clothing">Clothing</option>
+        </select>
+    </label>
+    <label>Sort by Price:
+        <select id="sortPrice" onchange="sortProducts()">
+            <option value="none">None</option>
+            <option value="low">Low to High</option>
+            <option value="high">High to Low</option>
+        </select>
+    </label>
+    <div class="product-grid" id="productGrid"></div>
+</section>
+
+<script>
+    /* ===== To-Do List with Local Storage ===== */
+    let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+    function renderTodos() {
+        const todoList = document.getElementById('todoList');
+        todoList.innerHTML = '';
+        todos.forEach((todo, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `${todo} <button onclick="deleteTodo(${index})">X</button>`;
+            todoList.appendChild(li);
+        });
+    }
+    function addTodo() {
+        const todoInput = document.getElementById('todoInput');
+        if (todoInput.value.trim() !== '') {
+            todos.push(todoInput.value);
+            localStorage.setItem('todos', JSON.stringify(todos));
+            todoInput.value = '';
+            renderTodos();
+        }
+    }
+    function deleteTodo(index) {
+        todos.splice(index, 1);
+        localStorage.setItem('todos', JSON.stringify(todos));
+        renderTodos();
+    }
+    renderTodos();
+
+    /* ===== Product Listing with Filter & Sort ===== */
+    const products = [
+        { name: 'Smartphone', category: 'electronics', price: 500 },
+        { name: 'Laptop', category: 'electronics', price: 1000 },
+        { name: 'T-Shirt', category: 'clothing', price: 20 },
+        { name: 'Jeans', category: 'clothing', price: 40 }
+    ];
+
+    function renderProducts(items) {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = '';
+        items.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `<h3>${product.name}</h3><p>Category: ${product.category}</p><p>Price: $${product.price}</p>`;
+            grid.appendChild(card);
+        });
+    }
+
+    function filterProducts() {
+        const category = document.getElementById('categoryFilter').value;
+        let filtered = category === 'all' ? products : products.filter(p => p.category === category);
+        renderProducts(filtered);
+    }
+
+    function sortProducts() {
+        const sortValue = document.getElementById('sortPrice').value;
+        let sorted = [...products];
+        if (sortValue === 'low') {
+            sorted.sort((a, b) => a.price - b.price);
+        } else if (sortValue === 'high') {
+            sorted.sort((a, b) => b.price - a.price);
+        }
+        renderProducts(sorted);
+    }
+
+    renderProducts(products);
+</script>
+
+</body>
+</html>
